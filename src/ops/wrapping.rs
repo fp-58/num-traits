@@ -308,6 +308,12 @@ fn test_wrapping_traits() {
     fn wrapping_sub<T: WrappingSub>(a: T, b: T) -> T {
         a.wrapping_sub(&b)
     }
+    fn wrapping_add_signed<T: WrappingAddSigned<U>, U>(a: T, b: U) -> T {
+        a.wrapping_add_signed(&b)
+    }
+    fn wrapping_add_unsigned<T: WrappingAddUnsigned<U>, U>(a: T, b: U) -> T {
+        a.wrapping_add_unsigned(&b)
+    }
     fn wrapping_mul<T: WrappingMul>(a: T, b: T) -> T {
         a.wrapping_mul(&b)
     }
@@ -322,6 +328,9 @@ fn test_wrapping_traits() {
     }
     assert_eq!(wrapping_add(255, 1), 0u8);
     assert_eq!(wrapping_sub(0, 1), 255u8);
+    assert_eq!(wrapping_add_signed(255, 1), 0u8);
+    assert_eq!(wrapping_add_signed(0, -1), 255u8);
+    assert_eq!(wrapping_add_unsigned(127, 1), -128i8);
     assert_eq!(wrapping_mul(255, 2), 254u8);
     assert_eq!(wrapping_neg(255), 1u8);
     assert_eq!(wrapping_shl(255, 8), 255u8);
