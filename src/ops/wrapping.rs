@@ -62,6 +62,34 @@ wrapping_impl!(WrappingSub, wrapping_sub, i64);
 wrapping_impl!(WrappingSub, wrapping_sub, isize);
 wrapping_impl!(WrappingSub, wrapping_sub, i128);
 
+/// Performs addition with a signed number that wraps around on overflow.
+pub trait WrappingAddSigned<Rhs>: WrappingAdd + WrappingSub {
+    /// Wrapping (modular) addition with a signed number. Computes `self + other`, wrapping around
+    /// at the boundary of the type.
+    fn wrapping_add_signed(&self, v: &Rhs) -> Self;
+}
+
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, u8, i8);
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, u16, i16);
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, u32, i32);
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, u64, i64);
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, usize, isize);
+wrapping_impl!(WrappingAddSigned, wrapping_add_signed, u128, i128);
+
+/// Performs addition with an unsigned number that wraps around on overflow.
+pub trait WrappingAddUnsigned<Rhs>: WrappingAdd + WrappingSub {
+    /// Wrapping (modular) addition with an unsigned number. Computes `self + other`, wrapping
+    /// around at the boundary of the type.
+    fn wrapping_add_unsigned(&self, v: &Rhs) -> Self;
+}
+
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, i8, u8);
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, i16, u16);
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, i32, u32);
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, i64, u64);
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, isize, usize);
+wrapping_impl!(WrappingAddUnsigned, wrapping_add_unsigned, i128, u128);
+
 /// Performs multiplication that wraps around on overflow.
 pub trait WrappingMul: Sized + Mul<Self, Output = Self> {
     /// Wrapping (modular) multiplication. Computes `self * other`, wrapping around at the boundary
@@ -221,6 +249,22 @@ where
 {
     fn wrapping_sub(&self, v: &Self) -> Self {
         Wrapping(self.0.wrapping_sub(&v.0))
+    }
+}
+impl<T: WrappingAddSigned<Rhs>, Rhs> WrappingAddSigned<Wrapping<Rhs>> for Wrapping<T>
+where
+    Wrapping<T>: WrappingAdd + WrappingSub,
+{
+    fn wrapping_add_signed(&self, v: &Wrapping<Rhs>) -> Self {
+        Wrapping(self.0.wrapping_add_signed(&v.0))
+    }
+}
+impl<T: WrappingAddUnsigned<Rhs>, Rhs> WrappingAddUnsigned<Wrapping<Rhs>> for Wrapping<T>
+where
+    Wrapping<T>: WrappingAdd + WrappingSub,
+{
+    fn wrapping_add_unsigned(&self, v: &Wrapping<Rhs>) -> Self {
+        Wrapping(self.0.wrapping_add_unsigned(&v.0))
     }
 }
 impl<T: WrappingMul> WrappingMul for Wrapping<T>
